@@ -1,0 +1,18 @@
+; NS & PTR records
+$TTL    604800
+@       IN      SOA     ns1.{{ domain_url }}. email.gmail.com. (
+                              3         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+; list nameservers
+        IN      NS      ns1.{{ domain_url }}.
+        IN      NS      ns2.{{ domain_url }}.
+
+; PTR records
+        IN      PTR     ns1.{{ domain_url }}.
+        IN      PTR     ns2.{{ domain_url }}.
+        IN      PTR     test1.{{ domain_url }}.
+        IN      PTR     {{ domain_url }}.
+        IN      PTR     www.{{ domain_url }}.
