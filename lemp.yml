@@ -19,3 +19,12 @@
       register: r_ip
     - set_fact:
         r_ip={{ r_ip.stdout }}
+
+    - name: Install LEMP, Bind9 Packages
+      apt:
+        name={{ item }}
+        update_cache=yes
+        state=latest
+        force_apt_get=yes
+      loop: [ 'nginx', 'mysql-server', 'python3-pymysql', 'python-pymysql', 'php-fpm', 'php-mysql', 'php-curl', 'php-gd', 'php-intl', 'php-mbstring', 'php-soap', 'php-xml', 'php-xmlrpc', 'php-zip', 'bind9', 'bind9-host', 'bind9utils' , 'bind9-doc', 'dnsutils' ]     
+   
