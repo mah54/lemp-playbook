@@ -116,3 +116,21 @@
 #        recurse: yes
 #        owner: root
 #        group: root
+
+    # Nginx Configuration
+
+    - name: Sets Nginx conf file
+      template:
+        src: "files/nginx.conf.j2"
+        dest: "/etc/nginx/sites-available/{{ nginx_conf }}"
+    - name: Removes default site
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Reload Nginx
+    - name: Enable new site
+      ansible.builtin.file:
+        src: "/etc/nginx/sites-available/{{ nginx_conf }}"
+        dest: "/etc/nginx/sites-enabled/{{ nginx_conf }}"
+        state: link
+      notify: Reload Nginx
