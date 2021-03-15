@@ -6,3 +6,16 @@
 
   vars_files:
     - ./files/variables.yml
+
+  tasks:
+    - name: get ip address
+      shell: hostname  -I | cut -f1 -d' '
+      register: ip_address
+    - set_fact:
+        ip_address={{ ip_address.stdout }}
+    
+    - name: get reverse ip address
+      shell: echo {{ ip_address }} | awk -F. '{print $4"."$3"."$2"."$1}'
+      register: r_ip
+    - set_fact:
+        r_ip={{ r_ip.stdout }}
