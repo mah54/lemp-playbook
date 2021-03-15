@@ -134,3 +134,43 @@
         dest: "/etc/nginx/sites-enabled/{{ nginx_conf }}"
         state: link
       notify: Reload Nginx
+    # Bind9 Configuration
+    - name: Place named.conf.options file
+      template:
+        src: "files/named.conf.options.j2"
+        dest: "/etc/bind/named.conf.options"
+    - name: Place named.conf.local file
+      template:
+        src: "files/named.conf.local.j2"
+        dest: "/etc/bind/named.conf.local"
+    - name: Create zones directory
+      ansible.builtin.file:
+        path: /etc/bind/zones
+        state: directory
+    - name: Place db.domain file
+      template:
+        src: "files/db.domain.j2"
+        dest: "/etc/bind/zones/db.{{ domain_url }}"
+    - name: Place db.ptr file
+      template:
+        src: "files/db.ptr.j2"
+        dest: "/etc/bind/zones/db.{{ r_ip }}"
+      notify: Restart bind9
+	  
+	- name: restart systemd-resolved
+      ansible.builtin.service:
+        name=systemd-resolved
+        state=restarted
+		
+# Handlers
+  handlers:
+    - name: Reload nginx
+      ansible.builtin.service:
+        name=nginx
+        state=reloaded
+
+    - name: Restart bind9
+      ansible.builtin.service:
+        name=bind9
+        state=restarted
+
