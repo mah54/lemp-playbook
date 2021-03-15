@@ -93,3 +93,26 @@
         recurse: yes
         owner: www-data
         group: www-data
+
+#    - name: Download and unarchive a EasyRSA-3
+#      ansible.builtin.unarchive:
+#        src: https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.8/EasyRSA-3.0.8.tgz
+#        dest: ~/
+#        remote_src: yes
+#    - name: rename easy-rsa
+#      command: mv ~/EasyRSA-3.0.8 ~/easy-rsa
+#    - name: Remove EasyRSA-3.0.8.tgz
+#      ansible.builtin.file:
+#        path: ~/EasyRSA-3.0.8.tgz
+#        state: absent
+#    - name copy vars to remote host
+#      ansible.builtin.copy:
+#        src: ~/lemp-playbook/vars
+#        dest: ~/easy-rsa/
+#    - name: Change easy-rsa ownership, group and permissions
+#      ansible.builtin.file:
+#        path: ~/easy-rsa
+#        state: directory
+#        recurse: yes
+#        owner: root
+#        group: root
