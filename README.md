@@ -1,3 +1,4 @@
 # lemp-playbook
-Set arbitrary valiables in files/variables.yml
+Set arbitrary values in files/variables.yml
+
 Usage: ansible-playbook lemp.yml
