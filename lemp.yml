@@ -1,0 +1,8 @@
+---
+- hosts: lempstack
+  gather_facts: yes
+  become: true
+  become_user: root
+
+  vars_files:
+    - ./files/variables.yml
