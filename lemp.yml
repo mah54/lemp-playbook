@@ -28,3 +28,22 @@
         force_apt_get=yes
       loop: [ 'nginx', 'mysql-server', 'python3-pymysql', 'python-pymysql', 'php-fpm', 'php-mysql', 'php-curl', 'php-gd', 'php-intl', 'php-mbstring', 'php-soap', 'php-xml', 'php-xmlrpc', 'php-zip', 'bind9', 'bind9-host', 'bind9utils' , 'bind9-doc', 'dnsutils' ]     
    
+    # MySQL - Create db and user
+
+    - name: Create WordPress database
+      mysql_db:
+        name: "{{ db_name }}"
+        state: present
+        login_user: root
+        login_password: "{{ db_pw }}"
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+            
+    - name: Create WordPress db_user and grant permissions to WordPress DB
+      mysql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_pw }}"
+        priv: "{{ db_name }}.*:ALL"
+        state: present
+        login_user: root
+        login_password: "{{ db_pw }}"
+        login_unix_socket: /var/run/mysqld/mysqld.sock
