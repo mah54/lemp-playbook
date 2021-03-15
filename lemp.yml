@@ -47,3 +47,49 @@
         login_user: root
         login_password: "{{ db_pw }}"
         login_unix_socket: /var/run/mysqld/mysqld.sock
+
+    # WP-CLI
+    - name: download wp-cli
+      get_url:
+        url="https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar"
+        dest="~/"
+    - name: Touch a file, to set the permissions
+      ansible.builtin.file:
+        path: ~/wp-cli.phar
+        state: touch
+        mode: +x
+    - name: move wp-cli
+      command: mv ~/wp-cli.phar /usr/local/bin/wp-cli
+    - name: Create wordpress directory
+      ansible.builtin.file:
+        path: /var/www/wordpress
+        state: directory
+
+    - name: Download wordpress
+      command: wp-cli core download
+        --path= "/var/www/wordpress"
+        --allow-root
+    - name: Configure WordPress
+      command: wp-cli config create
+        --path="/var/www/wordpress"
+        --dbname="{{ db_name }}"
+        --dbuser="{{ db_user }}"
+        --dbpass="{{ db_pw }}"
+        --locale=en_DB
+        --allow-root
+    - name: Install WordPress tables
+      command: wp-cli core install
+        --path="/var/www/wordpress"
+        --url="{{ domain_url }}"
+        --title="{{ domain_url }}"
+        --admin_user="{{ db_user }}"
+        --admin_password="{{ db_pw }}"
+        --admin_email=email@gmail.com
+        --allow-root
+    - name: Recursively change ownership of a directory
+      ansible.builtin.file:
+        path: /var/www/wordpress
+        state: directory
+        recurse: yes
+        owner: www-data
+        group: www-data
