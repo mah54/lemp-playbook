@@ -6,3 +6,9 @@ ssl_path: "/etc/nginx/ssl"
 db_name='google'
 db_user='wordpressuser'
 db_pw='password'
+
+# ssl variables
+keys_path: '~/lemp-playbook/etc/certs'
+server_private_key: 'google-nginx'
+server_csr: 'google-nginx'
+server_crt: 'google-nginx'
