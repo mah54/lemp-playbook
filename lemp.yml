@@ -6,6 +6,10 @@
 
   vars_files:
     - ./files/variables.yml
+    
+#  tasks:
+#    - debug: var=hostvars[lempstack]['ansible_default_ipv4']['address']
+
 
   tasks:
     - name: get ip address
@@ -28,7 +32,7 @@
         force_apt_get=yes
       loop: [ 'nginx', 'mysql-server', 'python3-pymysql', 'python-pymysql', 'php-fpm', 'php-mysql', 'php-curl', 'php-gd', 'php-intl', 'php-mbstring', 'php-soap', 'php-xml', 'php-xmlrpc', 'php-zip', 'bind9', 'bind9-host', 'bind9utils' , 'bind9-doc', 'dnsutils' ]     
    
-    # MySQL - Create db and user
+    # MySQL Configuration
 
     - name: Create WordPress database
       mysql_db:
@@ -47,7 +51,7 @@
         login_user: root
         login_password: "{{ db_pw }}"
         login_unix_socket: /var/run/mysqld/mysqld.sock
-
+        
     # WP-CLI
     - name: download wp-cli
       get_url:
@@ -93,29 +97,42 @@
         recurse: yes
         owner: www-data
         group: www-data
-
-#    - name: Download and unarchive a EasyRSA-3
-#      ansible.builtin.unarchive:
-#        src: https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.8/EasyRSA-3.0.8.tgz
-#        dest: ~/
-#        remote_src: yes
-#    - name: rename easy-rsa
-#      command: mv ~/EasyRSA-3.0.8 ~/easy-rsa
-#    - name: Remove EasyRSA-3.0.8.tgz
-#      ansible.builtin.file:
-#        path: ~/EasyRSA-3.0.8.tgz
-#        state: absent
-#    - name copy vars to remote host
-#      ansible.builtin.copy:
-#        src: ~/lemp-playbook/vars
-#        dest: ~/easy-rsa/
-#    - name: Change easy-rsa ownership, group and permissions
-#      ansible.builtin.file:
-#        path: ~/easy-rsa
-#        state: directory
-#        recurse: yes
-#        owner: root
-#        group: root
+    
+    # OpenSSL certificate
+    - name: create a directory to store keys
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0775
+      loop:
+        - {{ keys_path }}
+        
+    - name: Create key pair for the server
+      openssl_privatekey:
+        path: "{{ keys_path }}/{{ server_private_key }}.rsa"
+        size: 2048
+        
+    - name: Create certificate signing request
+      openssl_csr:
+        common_name: "{{ domain_url }}"
+        country_name: "US"
+        email_address: "email@gmail.com"
+        locality_name: "SanFrancisco"
+        organization_name: "{{ domain_url }}"
+        path: "{{ keys_path }}/{{ server_csr }}.csr"
+        subject_alt_name: 
+          - "DNS:*.{{ domain_url }}"
+          - "DNS:{{ domain_url }}"
+        privatekey_path: "{{ keys_path }}/{{ server_private_key }}.rsa"
+        
+    - name: Create self-signed certificate
+      openssl_certificate:
+        csr_path: "{{ keys_path }}/{{ server_csr }}.csr"
+        path: "{{ keys_path }}/{{ server_crt }}.crt"
+        provider: selfsigned
+        privatekey_path: "{{ keys_path }}/{{ server_private_key }}.rsa"
 
     # Nginx Configuration
 
@@ -134,6 +151,7 @@
         dest: "/etc/nginx/sites-enabled/{{ nginx_conf }}"
         state: link
       notify: Reload Nginx
+
     # Bind9 Configuration
     - name: Place named.conf.options file
       template:
@@ -156,12 +174,12 @@
         src: "files/db.ptr.j2"
         dest: "/etc/bind/zones/db.{{ r_ip }}"
       notify: Restart bind9
-	  
-	- name: restart systemd-resolved
+      
+    - name: restart systemd-resolved
       ansible.builtin.service:
         name=systemd-resolved
         state=restarted
-		
+        
 # Handlers
   handlers:
     - name: Reload nginx
@@ -174,3 +192,4 @@
         name=bind9
         state=restarted
 
+    
