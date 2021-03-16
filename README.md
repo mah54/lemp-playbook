@@ -1,4 +1,5 @@
 # lemp-playbook
-Set arbitrary values in files/variables.yml
+1. Add [lempstack] group to /etc/ansible/hosts.
+2. Set arbitrary values in files/variables.yml.
 
 Usage: ansible-playbook lemp.yml
