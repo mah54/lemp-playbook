@@ -150,7 +150,7 @@
         src: "/etc/nginx/sites-available/{{ nginx_conf }}"
         dest: "/etc/nginx/sites-enabled/{{ nginx_conf }}"
         state: link
-      notify: Reload Nginx
+      notify: Restart nginx
 
     # Bind9 Configuration
     - name: Place named.conf.options file
@@ -182,10 +182,10 @@
         
 # Handlers
   handlers:
-    - name: Reload nginx
+    - name: Restart nginx
       ansible.builtin.service:
         name=nginx
-        state=reloaded
+        state=restarted
 
     - name: Restart bind9
       ansible.builtin.service:
