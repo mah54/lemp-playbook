@@ -3,9 +3,9 @@ nginx_conf: "{{ domain_url }}.conf"
 ssl_path: "/etc/nginx/ssl"
 
 # mysql & wordpress variables
-db_name='google'
-db_user='wordpressuser'
-db_pw='password'
+db_name: 'google'
+db_user: 'wordpressuser'
+db_pw: 'password'
 
 # ssl variables
 keys_path: '~/lemp-playbook/etc/certs'
