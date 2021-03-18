@@ -8,9 +8,8 @@ server {
         listen 443 ssl default_server;
         listen [::]:443 ssl default_server;
 
-        ssl on;
         ssl_certificate {{ keys_path }}/{{ server_crt }}.crt;
-        ssl_certificate_key {{ keys_path }}/{{ server_private_key }}.key;
+        ssl_certificate_key {{ keys_path }}/{{ server_private_key }}.rsa;
 
 
         root /var/www/wordpress;
